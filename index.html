@@ -127,6 +127,117 @@
 <button id="ChatGPT">ChatGPT</button></a>
 </div>
 
+  <style>
+    body {
+      margin: 0;
+      background: #0e0e0e;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    /* Overlay (background blur) */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(12px);
+      z-index: 999;
+    }
+
+    /* Popup (curved glass panel) */
+    #popup {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(30px);
+      border-radius: 28px;
+      padding: 30px;
+      width: 90%;
+      max-width: 360px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.15);
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.35s ease;
+    }
+
+    #popup.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    h3 {
+      margin-top: 0;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    /* 🔥 Liquid glass green button */
+    .glass-green {
+      margin-top: 15px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(46, 204, 113, 0.6);
+      background: rgba(46, 204, 113, 0.15);
+      color: #2ecc71;
+      font-weight: bold;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.2);
+    }
+
+    .glass-green:hover {
+      background: rgba(46, 204, 113, 0.3);
+      box-shadow: 0 12px 35px rgba(46, 204, 113, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .glass-green:active {
+      transform: scale(0.97);
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div id="overlay">
+  <div id="popup">
+    <h3>Version Changes</h3>
+    <ul>
+      <li>Improved performance</li>
+      <li>New UI layout</li>
+      <li>Bug fixes</li>
+      <li>Grades Quick Button</li>
+    
+    </ul>
+
+    <button class="glass-green" onclick="closePopup()">Got it</button>
+  </div>
+</div>
+
+<script>
+  const VERSION = "update_v1";
+  const key = "seen_" + VERSION;
+
+  const overlay = document.getElementById("overlay");
+  const popup = document.getElementById("popup");
+
+  if (!localStorage.getItem(key)) {
+    overlay.style.display = "flex";
+    setTimeout(() => popup.classList.add("active"), 10);
+  }
+
+  function closePopup() {
+    localStorage.setItem(key, "true");
+    popup.classList.remove("active");
+    setTimeout(() => overlay.style.display = "none", 300);
+  }
+</script>
 
 
 
