@@ -60,11 +60,18 @@
 function openPage(file) {
     const newTab = window.open("about:blank", "_blank");
 
-    newTab.document.write(`
+    const doc = newTab.document;
+
+    doc.open();
+    doc.write(`
+        <!DOCTYPE html>
         <html>
         <head>
+            <title>LEGIT GAMES</title>
+
+            <link rel="icon" href="/normal.png">
+
             <style>
-                /* Make sure the page itself has no margin or padding */
                 html, body {
                     margin: 0;
                     padding: 0;
@@ -72,34 +79,35 @@ function openPage(file) {
                     overflow: hidden;
                 }
 
-                /* Container fills entire viewport */
                 #appContainer {
                     width: 100vw;
                     height: 100vh;
-                    margin: 0;
-                    padding: 0;
                 }
 
-                /* Iframe fills container perfectly */
-                #fullscreenFrame {
+                iframe {
                     width: 100%;
                     height: 100%;
-                    border: 0;         /* no border at all */
-                    display: block;    /* removes inline spacing */
-                    margin: 0;         /* remove any iframe spacing */
-                    padding: 0;
+                    border: none;
+                    display: block;
                 }
             </style>
         </head>
+
         <body>
-            <div id="appContainer">
-                <iframe id="fullscreenFrame" src="${file}"></iframe>
-            </div>
+            <iframe src="${file}"></iframe>
         </body>
         </html>
     `);
 
-    newTab.document.close();
+    doc.close();
+
+    // 🔥 Force title + favicon (this is the important part)
+    newTab.document.title = "LEGIT GAMES";
+
+    const icon = newTab.document.createElement("link");
+    icon.rel = "icon";
+    icon.href = "/normal.png";
+    newTab.document.head.appendChild(icon);
 }
 </script>
   <div class="container">
