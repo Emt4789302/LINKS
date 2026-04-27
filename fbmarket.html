@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef1f5;
+}
+
+/* Top bar */
+.topbar {
+  background: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.search {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: none;
+  background: #f0f2f5;
+}
+
+/* Layout */
+.container {
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 230px;
+  background: white;
+  padding: 15px;
+  height: calc(100vh - 50px);
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+
+.category {
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.category:hover {
+  background: #f0f2f5;
+}
+
+/* Grid */
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 10px;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.title {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.meta {
+  font-size: 12px;
+  color: gray;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="logo">Marketplace</div>
+  <input class="search" placeholder="Search items...">
+</div>
+
+<div class="container">
+
+  <div class="sidebar">
+    <div class="category">All</div>
+    <div class="category">Dirt Bikes</div>
+    <div class="category">ATVs</div>
+    <div class="category">Trucks</div>
+    <div class="category">Tools</div>
+    <div class="category">Farm</div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+</div>
+
+<script>
+const listings = [
+  // Dirt Bikes
+  {title:"Honda CRF250", price:"$3200", owner:"Tyler M.", location:"Erie, PA"},
+  {title:"Yamaha YZ125", price:"$2800", owner:"Cole R.", location:"Girard"},
+  {title:"Kawasaki KX85", price:"$1800", owner:"Noah B.", location:"Erie"},
+  {title:"Trail Bike 110cc", price:"$900", owner:"Hunter D.", location:"Local"},
+  {title:"Suzuki RMZ250", price:"$3100", owner:"Ethan L.", location:"PA"},
+
+  // ATVs
+  {title:"Polaris Sportsman 570", price:"$4500", owner:"Jake H.", location:"Edinboro"},
+  {title:"Honda FourTrax 300", price:"$2200", owner:"Logan P.", location:"Waterford"},
+  {title:"Yamaha Raptor 660", price:"$3000", owner:"Brady S.", location:"Erie"},
+  {title:"Arctic Cat 500", price:"$2600", owner:"Mason T.", location:"Nearby"},
+  {title:"Suzuki LTZ400", price:"$3500", owner:"Chris P.", location:"Local"},
+
+  // Trucks
+  {title:"Ford F-150", price:"$4200", owner:"Ryan K.", location:"Erie"},
+  {title:"Chevy Silverado", price:"$5000", owner:"Luke G.", location:"Girard"},
+  {title:"Dodge Ram Work Truck", price:"$2500", owner:"Ben C.", location:"Waterford"},
+
+  // Tools / Farm
+  {title:"Chainsaw (Stihl)", price:"$300", owner:"Dylan M.", location:"Local"},
+  {title:"Log Splitter", price:"$900", owner:"Trevor H.", location:"County"},
+  {title:"Farm Trailer", price:"$1500", owner:"Nick S.", location:"Pickup"},
+  {title:"Riding Mower", price:"$1200", owner:"Caleb J.", location:"Erie"},
+  {title:"Zero Turn Mower", price:"$2800", owner:"Austin R.", location:"Nearby"},
+  {title:"Used Tractor", price:"$3800", owner:"Bill R.", location:"Waterford"},
+
+  // Extras
+  {title:"Go Kart", price:"$1100", owner:"Cody F.", location:"Local"},
+  {title:"Side by Side", price:"$7200", owner:"Evan L.", location:"Erie"},
+  {title:"Snowmobile", price:"$2000", owner:"Matt T.", location:"PA"},
+  {title:"ATV Tires", price:"$200", owner:"Josh V.", location:"Nearby"},
+  {title:"Dirt Bike Gear", price:"$150", owner:"Chris P.", location:"Local"},
+
+  // duplicate more for realism
+  ...Array.from({length: 30}, (_, i) => ({
+    title: "Used Farm Item #" + (i+1),
+    price: "$" + (100 + i * 10),
+    owner: "Seller " + (i+1),
+    location: "Erie Area"
+  }))
+];
+
+const grid = document.getElementById("grid");
+
+listings.forEach(item => {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  card.innerHTML = `
+    <img src="https://via.placeholder.com/300">
+    <div class="card-body">
+      <div class="price">${item.price}</div>
+      <div class="title">${item.title}</div>
+      <div class="meta">${item.location}</div>
+      <div class="meta">Seller: ${item.owner}</div>
+    </div>
+  `;
+
+  grid.appendChild(card);
+});
+</script>
+
+</body>
+</html>
