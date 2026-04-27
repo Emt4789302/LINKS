@@ -46,7 +46,6 @@ body {
   background: white;
   padding: 15px;
   height: calc(100vh - 50px);
-  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
 }
 
 .category {
@@ -55,8 +54,9 @@ body {
   cursor: pointer;
 }
 
-.category:hover {
-  background: #f0f2f5;
+.category:hover,
+.category.active {
+  background: #dfe6ff;
 }
 
 /* Grid */
@@ -68,17 +68,17 @@ body {
   padding: 20px;
 }
 
-/* Cards */
+/* Card */
 .card {
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  transition: 0.2s;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .card:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
 .card img {
@@ -93,17 +93,43 @@ body {
 
 .price {
   font-weight: bold;
-  font-size: 16px;
-}
-
-.title {
-  font-size: 14px;
-  margin: 5px 0;
 }
 
 .meta {
   font-size: 12px;
   color: gray;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-content img {
+  width: 100%;
+}
+
+.modal-body {
+  padding: 15px;
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+  font-size: 18px;
 }
 </style>
 </head>
@@ -112,87 +138,128 @@ body {
 
 <div class="topbar">
   <div class="logo">Marketplace</div>
-  <input class="search" placeholder="Search items...">
+  <input class="search" placeholder="Search items..." oninput="render()">
 </div>
 
 <div class="container">
 
   <div class="sidebar">
-    <div class="category">All</div>
-    <div class="category">Dirt Bikes</div>
-    <div class="category">ATVs</div>
-    <div class="category">Trucks</div>
-    <div class="category">Tools</div>
-    <div class="category">Farm</div>
+    <div class="category active" onclick="filterCategory('All')">All</div>
+    <div class="category" onclick="filterCategory('Dirt Bikes')">Dirt Bikes</div>
+    <div class="category" onclick="filterCategory('ATVs')">ATVs</div>
+    <div class="category" onclick="filterCategory('Trucks')">Trucks</div>
+    <div class="category" onclick="filterCategory('Tools')">Tools</div>
+    <div class="category" onclick="filterCategory('Farm')">Farm</div>
   </div>
 
   <div class="grid" id="grid"></div>
 
 </div>
 
+<!-- Modal -->
+<div class="modal" id="modal" onclick="closeModal(event)">
+  <div class="modal-content">
+    <img id="mImg">
+    <div class="modal-body">
+      <span class="close" onclick="closeModal(event)">✖</span>
+      <h3 id="mTitle"></h3>
+      <p id="mPrice"></p>
+      <p id="mOwner"></p>
+      <p id="mLocation"></p>
+    </div>
+  </div>
+</div>
+
 <script>
+
+let currentCategory = "All";
+let searchText = "";
+
 const listings = [
-  // Dirt Bikes
-  {title:"Honda CRF250", price:"$3200", owner:"Tyler M.", location:"Erie, PA"},
-  {title:"Yamaha YZ125", price:"$2800", owner:"Cole R.", location:"Girard"},
-  {title:"Kawasaki KX85", price:"$1800", owner:"Noah B.", location:"Erie"},
-  {title:"Trail Bike 110cc", price:"$900", owner:"Hunter D.", location:"Local"},
-  {title:"Suzuki RMZ250", price:"$3100", owner:"Ethan L.", location:"PA"},
+  {title:"Honda CRF250", price:"$3200", owner:"Tyler M.", location:"Erie", cat:"Dirt Bikes"},
+  {title:"Yamaha YZ125", price:"$2800", owner:"Cole R.", location:"Girard", cat:"Dirt Bikes"},
+  {title:"Kawasaki KX85", price:"$1800", owner:"Noah B.", location:"Erie", cat:"Dirt Bikes"},
 
-  // ATVs
-  {title:"Polaris Sportsman 570", price:"$4500", owner:"Jake H.", location:"Edinboro"},
-  {title:"Honda FourTrax 300", price:"$2200", owner:"Logan P.", location:"Waterford"},
-  {title:"Yamaha Raptor 660", price:"$3000", owner:"Brady S.", location:"Erie"},
-  {title:"Arctic Cat 500", price:"$2600", owner:"Mason T.", location:"Nearby"},
-  {title:"Suzuki LTZ400", price:"$3500", owner:"Chris P.", location:"Local"},
+  {title:"Polaris Sportsman 570", price:"$4500", owner:"Jake H.", location:"Edinboro", cat:"ATVs"},
+  {title:"Honda FourTrax", price:"$2200", owner:"Logan P.", location:"Waterford", cat:"ATVs"},
+  {title:"Yamaha Raptor 660", price:"$3000", owner:"Brady S.", location:"Erie", cat:"ATVs"},
 
-  // Trucks
-  {title:"Ford F-150", price:"$4200", owner:"Ryan K.", location:"Erie"},
-  {title:"Chevy Silverado", price:"$5000", owner:"Luke G.", location:"Girard"},
-  {title:"Dodge Ram Work Truck", price:"$2500", owner:"Ben C.", location:"Waterford"},
+  {title:"Ford F-150", price:"$4200", owner:"Ryan K.", location:"Erie", cat:"Trucks"},
+  {title:"Chevy Silverado", price:"$5000", owner:"Luke G.", location:"Girard", cat:"Trucks"},
 
-  // Tools / Farm
-  {title:"Chainsaw (Stihl)", price:"$300", owner:"Dylan M.", location:"Local"},
-  {title:"Log Splitter", price:"$900", owner:"Trevor H.", location:"County"},
-  {title:"Farm Trailer", price:"$1500", owner:"Nick S.", location:"Pickup"},
-  {title:"Riding Mower", price:"$1200", owner:"Caleb J.", location:"Erie"},
-  {title:"Zero Turn Mower", price:"$2800", owner:"Austin R.", location:"Nearby"},
-  {title:"Used Tractor", price:"$3800", owner:"Bill R.", location:"Waterford"},
+  {title:"Chainsaw Stihl", price:"$300", owner:"Dylan M.", location:"Local", cat:"Tools"},
+  {title:"Log Splitter", price:"$900", owner:"Trevor H.", location:"County", cat:"Tools"},
 
-  // Extras
-  {title:"Go Kart", price:"$1100", owner:"Cody F.", location:"Local"},
-  {title:"Side by Side", price:"$7200", owner:"Evan L.", location:"Erie"},
-  {title:"Snowmobile", price:"$2000", owner:"Matt T.", location:"PA"},
-  {title:"ATV Tires", price:"$200", owner:"Josh V.", location:"Nearby"},
-  {title:"Dirt Bike Gear", price:"$150", owner:"Chris P.", location:"Local"},
-
-  // duplicate more for realism
-  ...Array.from({length: 30}, (_, i) => ({
-    title: "Used Farm Item #" + (i+1),
-    price: "$" + (100 + i * 10),
-    owner: "Seller " + (i+1),
-    location: "Erie Area"
-  }))
+  {title:"Riding Mower", price:"$1200", owner:"Caleb J.", location:"Erie", cat:"Farm"},
+  {title:"Used Tractor", price:"$3800", owner:"Bill R.", location:"Waterford", cat:"Farm"},
 ];
 
 const grid = document.getElementById("grid");
 
-listings.forEach(item => {
-  const card = document.createElement("div");
-  card.className = "card";
+function render() {
+  grid.innerHTML = "";
 
-  card.innerHTML = `
-    <img src="https://via.placeholder.com/300">
-    <div class="card-body">
-      <div class="price">${item.price}</div>
-      <div class="title">${item.title}</div>
-      <div class="meta">${item.location}</div>
-      <div class="meta">Seller: ${item.owner}</div>
-    </div>
-  `;
+  const filtered = listings.filter(item => {
+    const matchCategory = currentCategory === "All" || item.cat === currentCategory;
+    const matchSearch = item.title.toLowerCase().includes(searchText.toLowerCase());
+    return matchCategory && matchSearch;
+  });
 
-  grid.appendChild(card);
+  filtered.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.onclick = () => openModal(item);
+
+    card.innerHTML = `
+      <img src="https://via.placeholder.com/300">
+      <div class="card-body">
+        <div class="price">${item.price}</div>
+        <div>${item.title}</div>
+        <div class="meta">${item.location}</div>
+        <div class="meta">Seller: ${item.owner}</div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+function filterCategory(cat) {
+  currentCategory = cat;
+
+  document.querySelectorAll(".category").forEach(el => {
+    el.classList.remove("active");
+    if (el.innerText === cat || (cat === "All" && el.innerText === "All")) {
+      el.classList.add("active");
+    }
+  });
+
+  render();
+}
+
+document.querySelector(".search").addEventListener("input", e => {
+  searchText = e.target.value;
+  render();
 });
+
+function openModal(item) {
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("mImg").src = "https://via.placeholder.com/400";
+  document.getElementById("mTitle").innerText = item.title;
+  document.getElementById("mPrice").innerText = item.price;
+  document.getElementById("mOwner").innerText = "Seller: " + item.owner;
+  document.getElementById("mLocation").innerText = item.location;
+}
+
+function closeModal(e) {
+  if (e.target.id === "modal" || e.target.className === "close") {
+    document.getElementById("modal").style.display = "none";
+  }
+}
+
+render();
+
 </script>
 
 </body>
